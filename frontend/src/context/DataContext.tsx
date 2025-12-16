@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { PROGRAMS, MENTORS } from '@/lib/mock-data';
 
 // --- Types ---
 export type Role = 'learner' | 'mentor' | 'admin';
@@ -33,7 +34,6 @@ export interface Course {
     id: string;
     title: string;
     description: string;
-    price: string;
     mentorId: string;
     mentorName: string;
     level: string;
@@ -63,14 +63,16 @@ export interface AppState {
 
 export interface DataContextType extends AppState {
     // Actions
-    setCurrentUser: (user: User | null) => void;
+    // Actions
+    login: (user: User) => void;
+    logout: () => void;
     addCourse: (course: Omit<Course, 'id' | 'status' | 'studentsEnrolled' | 'rating'>) => void;
     updateCourseStatus: (courseId: string, status: CourseStatus) => void;
     enrollInCourse: (courseId: string) => void;
     updateProgress: (courseId: string, progress: number) => void;
 
     // Derived Stats Helpers
-    getMentorStats: (mentorId: string) => { students: number; revenue: number; courses: number; rating: number };
+    getMentorStats: (mentorId: string) => { totalStudents: number; activeCourses: number; pendingReviews: number; averageRating: number; revenue: number };
     getAdminStats: () => { totalRevenue: number; totalUsers: number; totalMentors: number; pendingCourses: number };
     getLearnerStats: (studentId: string) => { inProgress: number; completed: number; hours: number; streak: number };
 }
@@ -82,67 +84,95 @@ const INITIAL_USERS: User[] = [
     { id: 'a1', name: 'Admin User', email: 'admin@portal.com', role: 'admin', joinedDate: '2023-01-01' }
 ];
 
-const INITIAL_COURSES: Course[] = [
-    {
-        id: 'c1',
-        title: "Certified Meditation Teacher Training (Level 1)",
-        description: "Comprehensive guide to becoming a certified meditation teacher.",
-        price: "15000",
-        mentorId: 'm1',
-        mentorName: "Guru Vasishta",
-        level: "Beginner",
-        category: "Meditation",
-        image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        status: "Published",
-        studentsEnrolled: 850,
-        rating: 4.8,
-        modules: []
-    },
-    {
-        id: 'c2',
-        title: "Advanced Breathwork Techniques",
-        description: "Mastering the art of Pranayama.",
-        price: "12000",
-        mentorId: 'm1',
-        mentorName: "Guru Vasishta",
-        level: "Advanced",
-        category: "Wellness",
-        image: "https://images.unsplash.com/photo-1593811167562-9cef47bfc4d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        status: "Draft",
-        studentsEnrolled: 0,
-        rating: 0,
-        modules: []
-    },
-    {
-        id: 'c3',
-        title: "Chakra Balancing Workshop",
-        description: "Align your energy centers.",
-        price: "5000",
-        mentorId: 'm1',
-        mentorName: "Guru Vasishta",
-        level: "Intermediate",
-        category: "Spiritual",
-        image: "https://images.unsplash.com/photo-1544367563-12123d8965cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        status: "Pending", // For admin demo
-        studentsEnrolled: 0,
-        rating: 0,
-        modules: []
-    }
-];
+const INITIAL_COURSES: Course[] = PROGRAMS.map((p: any) => {
+    const mentor = MENTORS.find((m: any) => m.name === p.mentor);
+    return {
+        id: p.id,
+        title: p.title,
+        description: p.description,
+        mentorId: mentor ? mentor.id : 'm1',
+        mentorName: p.mentor,
+        level: p.level,
+        category: p.category,
+        image: p.image,
+        status: 'Published',
+        studentsEnrolled: p.enrolledCount,
+        rating: p.rating,
+        totalDuration: p.duration,
+        modules: p.modules.map((m: any, mIdx: number) => ({
+            id: `m${p.id}-${mIdx}`,
+            title: m.title,
+            lessons: m.subModules.map((sm: any, lIdx: number) => ({
+                id: `l${p.id}-${mIdx}-${lIdx}`,
+                title: sm.title,
+                duration: sm.duration,
+                type: 'video', // Default
+                isCompleted: false
+            }))
+        }))
+    };
+});
 
 const INITIAL_ENROLLMENTS: Enrollment[] = [
-    { courseId: 'c1', studentId: 'u1', progress: 35, completedLessons: ['l1', 'l2'], lastAccessed: '2 hours ago' }
+    { courseId: 'p1', studentId: 'u1', progress: 35, completedLessons: ['l1', 'l2'], lastAccessed: '2 hours ago' }
 ];
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export function DataProvider({ children }: { children: ReactNode }) {
-    const [currentUser, setCurrentUser] = useState<User | null>(INITIAL_USERS[0]); // Default to Uday
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [users, setUsers] = useState<User[]>(INITIAL_USERS);
     const [courses, setCourses] = useState<Course[]>(INITIAL_COURSES);
     const [enrollments, setEnrollments] = useState<Enrollment[]>(INITIAL_ENROLLMENTS);
 
+    // Load from LocalStorage
+    useEffect(() => {
+        const DATA_VERSION = 'v1.1'; // Increment when critical data structure changes
+        const storedVersion = localStorage.getItem('data_version');
+
+        if (storedVersion !== DATA_VERSION) {
+            // Version mismatch - Clear stale data to force re-initialization
+            console.log('Data version mismatch. Clearing stale data.');
+            localStorage.removeItem('courses');
+            localStorage.removeItem('enrollments');
+            // We keep 'currentUser' effectively keeping them logged in, 
+            // but we could clear that too if needed. For now, let's keep it convenience.
+            localStorage.setItem('data_version', DATA_VERSION);
+
+            // Re-save initial state to storage so it's fresh
+            // Actually, we don't need to save INITIAL_... to storage immediately, 
+            // the state `courses` is already initialized to INITIAL_COURSES.
+            // We just let the next effect cycle or action update storage.
+            return;
+        }
+
+        // Version match - Load data
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+            setCurrentUser(JSON.parse(storedUser));
+        }
+
+        const storedCourses = localStorage.getItem('courses');
+        if (storedCourses) {
+            setCourses(JSON.parse(storedCourses));
+        }
+
+        const storedEnrollments = localStorage.getItem('enrollments');
+        if (storedEnrollments) {
+            setEnrollments(JSON.parse(storedEnrollments));
+        }
+    }, []);
+
     // --- Actions ---
+    const login = (user: User) => {
+        setCurrentUser(user);
+        localStorage.setItem('currentUser', JSON.stringify(user));
+    };
+
+    const logout = () => {
+        setCurrentUser(null);
+        localStorage.removeItem('currentUser');
+    };
     const addCourse = (newCourseData: Omit<Course, 'id' | 'status' | 'studentsEnrolled' | 'rating'>) => {
         const newCourse: Course = {
             ...newCourseData,
@@ -151,11 +181,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
             studentsEnrolled: 0,
             rating: 0,
         };
-        setCourses(prev => [newCourse, ...prev]);
+        setCourses(prev => {
+            const updated = [newCourse, ...prev];
+            localStorage.setItem('courses', JSON.stringify(updated));
+            return updated;
+        });
     };
 
     const updateCourseStatus = (courseId: string, status: CourseStatus) => {
-        setCourses(prev => prev.map(c => c.id === courseId ? { ...c, status } : c));
+        setCourses(prev => {
+            const updated = prev.map(c => c.id === courseId ? { ...c, status } : c);
+            localStorage.setItem('courses', JSON.stringify(updated));
+            return updated;
+        });
     };
 
     const enrollInCourse = (courseId: string) => {
@@ -163,45 +201,57 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const exists = enrollments.find(e => e.courseId === courseId && e.studentId === currentUser.id);
         if (exists) return;
 
-        setEnrollments(prev => [...prev, {
-            courseId,
-            studentId: currentUser.id,
-            progress: 0,
-            completedLessons: [],
-            lastAccessed: 'Just now'
-        }]);
+        setEnrollments(prev => {
+            const updated = [...prev, {
+                courseId,
+                studentId: currentUser.id,
+                progress: 0,
+                completedLessons: [],
+                lastAccessed: 'Just now'
+            }];
+            localStorage.setItem('enrollments', JSON.stringify(updated));
+            return updated;
+        });
 
         // Update student count
-        setCourses(prev => prev.map(c => c.id === courseId ? { ...c, studentsEnrolled: c.studentsEnrolled + 1 } : c));
+        setCourses(prev => {
+            const updated = prev.map(c => c.id === courseId ? { ...c, studentsEnrolled: c.studentsEnrolled + 1 } : c);
+            localStorage.setItem('courses', JSON.stringify(updated));
+            return updated;
+        });
     };
 
     const updateProgress = (courseId: string, progress: number) => {
         if (!currentUser) return;
-        setEnrollments(prev => prev.map(e =>
-            (e.courseId === courseId && e.studentId === currentUser.id)
-                ? { ...e, progress, lastAccessed: 'Just now' }
-                : e
-        ));
+        setEnrollments(prev => {
+            const updated = prev.map(e =>
+                (e.courseId === courseId && e.studentId === currentUser.id)
+                    ? { ...e, progress, lastAccessed: 'Just now' }
+                    : e
+            );
+            localStorage.setItem('enrollments', JSON.stringify(updated));
+            return updated;
+        });
     };
 
     // --- Helpers ---
     const getMentorStats = (mentorId: string) => {
         const myCourses = courses.filter(c => c.mentorId === mentorId);
-        const totalStudents = myCourses.reduce((sum, c) => sum + c.studentsEnrolled, 0);
-        // Mock revenue logic: students * price (simplified)
-        const totalRevenue = myCourses.reduce((sum, c) => sum + (c.studentsEnrolled * parseInt(c.price || '0', 10)), 0);
+        const totalStudents = myCourses.reduce((acc, curr) => acc + curr.studentsEnrolled, 0);
+        const activeCourses = myCourses.filter(c => c.status === 'Published').length;
 
         return {
-            courses: myCourses.length,
-            students: totalStudents,
-            revenue: totalRevenue,
-            rating: 4.8 // Mocked average
+            totalStudents,
+            activeCourses,
+            pendingReviews: 5, // Mock
+            averageRating: 4.8, // Mock
+            revenue: totalStudents * 1000 // Mock revenue: 1000 per student
         };
     };
 
     const getAdminStats = () => {
         // Platform wide
-        const totalRevenue = courses.reduce((sum, c) => sum + (c.studentsEnrolled * parseInt(c.price || '0', 10)), 0);
+        const totalRevenue = 1542000; // Mocked Total Donations
         const pendingCourses = courses.filter(c => c.status === 'Pending').length;
         return {
             totalRevenue,
@@ -214,7 +264,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const getLearnerStats = (studentId: string) => {
         const myEnrollments = enrollments.filter(e => e.studentId === studentId);
         const completed = myEnrollments.filter(e => e.progress === 100).length;
-        const inProgress = myEnrollments.filter(e => e.progress < 100 && e.progress > 0).length;
+        const inProgress = myEnrollments.filter(e => e.progress < 100).length;
 
         return {
             inProgress,
@@ -230,7 +280,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
             users,
             courses,
             enrollments,
-            setCurrentUser,
+            login,
+            logout,
             addCourse,
             updateCourseStatus,
             enrollInCourse,

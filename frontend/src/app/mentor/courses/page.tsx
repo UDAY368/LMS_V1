@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -5,13 +7,12 @@ import { Edit, Eye, MoreVertical, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-const MY_COURSES = [
-    { id: 1, title: "Certified Meditation Teacher Training (Level 1)", status: "Published", students: 850, rating: 4.8, revenue: "₹2.5L" },
-    { id: 2, title: "Advanced Breathwork Techniques", status: "Draft", students: 0, rating: "-", revenue: "-" },
-    { id: 3, title: "Child Wisdom Module", status: "Published", students: 120, rating: 4.9, revenue: "₹85k" },
-];
+import { useData } from "@/context/DataContext";
 
 export default function CoursesPage() {
+    const { courses, currentUser } = useData();
+    const myCourses = courses.filter(c => c.mentorName === currentUser?.name);
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -27,21 +28,22 @@ export default function CoursesPage() {
             </div>
 
             <div className="grid gap-4">
-                {MY_COURSES.map((course) => (
+                {myCourses.map((course) => (
                     <Card key={course.id} className="overflow-hidden">
                         <CardContent className="p-0">
                             <div className="flex flex-col md:flex-row items-center justify-between p-6 gap-4">
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
                                         <h3 className="font-semibold text-lg truncate">{course.title}</h3>
-                                        <Badge variant={course.status === 'Published' ? "default" : "secondary"}>
+                                        <Badge variant={course.status === 'Published' ? "default" : course.status === 'Pending' ? "secondary" : "destructive"}>
                                             {course.status}
                                         </Badge>
                                     </div>
                                     <div className="flex gap-4 text-sm text-muted-foreground">
-                                        <span>{course.students} Students</span>
+                                        <span>{course.studentsEnrolled} Students</span>
                                         <span>{course.rating} Rating</span>
-                                        <span>{course.revenue} Revenue</span>
+                                        {/* Revenue mock based on students */}
+                                        <span>₹{(course.studentsEnrolled * 1000).toLocaleString()} Revenue</span>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -68,6 +70,12 @@ export default function CoursesPage() {
                         </CardContent>
                     </Card>
                 ))}
+                {myCourses.length === 0 && (
+                    <div className="text-center py-10 text-muted-foreground">
+                        <p>You haven't created any courses yet.</p>
+                        <Button variant="link" asChild><Link href="/mentor/courses/create">Create your first course</Link></Button>
+                    </div>
+                )}
             </div>
         </div>
     );

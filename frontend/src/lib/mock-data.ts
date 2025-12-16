@@ -6,11 +6,44 @@ export const PROGRAMS = [
         duration: "4 Weeks",
         level: "Beginner",
         mode: "Online + Weekend Live",
-        price: "₹15,000",
+
         description: "A foundational course designed to introduce you to the science of meditation, breathwork, and mindfulness. Perfect for those starting their journey.",
+        longDescription: "This comprehensive Level 1 certification is the perfect starting point for anyone feeling called to share the gift of meditation. Over 4 immersive weeks, you will journey through the history of meditation, understand the neuroscience of mindfulness, and master over 10 different meditation techniques. Our curriculum is designed not just to make you a teacher, but to deepen your own practice. You will emerge with the confidence to guide others and the certification to begin your professional journey.",
         image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
         mentor: "Rishi Ananda",
-        category: "Meditation"
+        category: "Meditation",
+        rating: 4.9,
+        reviewCount: 128,
+        enrolledCount: 1540,
+        modules: [
+            {
+                title: "Module 1: Foundations of Stillness",
+                duration: "6 Hours",
+                subModules: [
+                    { title: "History & Lineage of Meditation", duration: "1h 30m" },
+                    { title: "Scientific Benefits & Brain Waves", duration: "1h 30m" },
+                    { title: "Posture, Breath, and Mudras", duration: "3h 00m" }
+                ]
+            },
+            {
+                title: "Module 2: Breathwork & Prana",
+                duration: "8 Hours",
+                subModules: [
+                    { title: "Anatomy of Breathing", duration: "2h 00m" },
+                    { title: "Pranayama Techniques (Nadi Shodhana, Kapalabhati)", duration: "4h 00m" },
+                    { title: "Energy Locks (Bandhas)", duration: "2h 00m" }
+                ]
+            },
+            {
+                title: "Module 3: Guiding & Teaching",
+                duration: "10 Hours",
+                subModules: [
+                    { title: "Structuring a Class", duration: "3h 00m" },
+                    { title: "Voice Modulation & Holding Space", duration: "4h 00m" },
+                    { title: "Ethics of a Meditation Teacher", duration: "3h 00m" }
+                ]
+            }
+        ]
     },
     {
         id: "p2",
@@ -19,11 +52,44 @@ export const PROGRAMS = [
         duration: "12 Weeks",
         level: "Advanced",
         mode: "Hybrid",
-        price: "₹45,000",
+
         description: "Deep dive into ancient scriptures, quantum consciousness, and advanced energy healing techniques. Includes a 3-day retreat.",
+        longDescription: "For the serious seeker, this diploma bridges the gap between ancient vedic wisdom and modern quantum physics. Dr. Sarah Freeman guides you through a rigorous 12-week curriculum that explores the nature of reality, consciousness, and energy healing. This course includes a mandatory 3-day in-person immersion retreat (or virtual equivalent) to practice advanced techniques. You will learn to work with subtle energies, understand the laws of the universe, and apply these principles for profound healing and transformation.",
         image: "https://images.unsplash.com/photo-1593811167562-9cef47bfc4d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
         mentor: "Dr. Sarah Freeman",
-        category: "Spiritual Science"
+        category: "Spiritual Science",
+        rating: 4.8,
+        reviewCount: 95,
+        enrolledCount: 820,
+        modules: [
+            {
+                title: "Module 1: Quantum Consciousness",
+                duration: "15 Hours",
+                subModules: [
+                    { title: "The Observer Effect & Reality Creation", duration: "5h 00m" },
+                    { title: "Unified Field Theory", duration: "5h 00m" },
+                    { title: "Consciousness Beyond the Brain", duration: "5h 00m" }
+                ]
+            },
+            {
+                title: "Module 2: Advanced Energy Medicine",
+                duration: "20 Hours",
+                subModules: [
+                    { title: "Chakra Psychology & Healing", duration: "8h 00m" },
+                    { title: "Aura Reading & Cleansing", duration: "6h 00m" },
+                    { title: "Distant Healing Protocols", duration: "6h 00m" }
+                ]
+            },
+            {
+                title: "Module 3: Ancient Scriptures",
+                duration: "12 Hours",
+                subModules: [
+                    { title: "Upanishadic Wisdom", duration: "4h 00m" },
+                    { title: "Decoding the Sutras", duration: "4h 00m" },
+                    { title: "Karma Yoga in Modern Life", duration: "4h 00m" }
+                ]
+            }
+        ]
     },
     {
         id: "p3",
@@ -32,11 +98,35 @@ export const PROGRAMS = [
         duration: "6 Weeks",
         level: "Intermediate",
         mode: "Online Self-Paced",
-        price: "₹22,000",
+
         description: "Learn the art of conscious relaxation and holistic healing. Master Yoga Nidra techniques for stress management and therapy.",
-        image: "https://images.unsplash.com/photo-1544367563-12123d8965cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        longDescription: "In a world of constant stress, the art of deep rest is revolutionary. This course focuses on 'Yogic Sleep' or Yoga Nidra, a state of consciousness between waking and sleeping. Led by Yogini Meera, you will learn to induce deep relaxation to heal trauma, reduce anxiety, and improve sleep quality. This course also covers holistic wellness principles from Ayurveda, helping you design a balanced lifestyle for yourself and your future clients.",
+        image: "https://images.unsplash.com/photo-1593811167562-9cef47bfc4d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
         mentor: "Yogini Meera",
-        category: "Wellness"
+        category: "Wellness",
+        rating: 5.0,
+        reviewCount: 210,
+        enrolledCount: 2300,
+        modules: [
+            {
+                title: "Module 1: The Physiology of Rest",
+                duration: "8 Hours",
+                subModules: [
+                    { title: "Sympathetic vs Parasympathetic Nervous System", duration: "2h 00m" },
+                    { title: "The Science of Sleep", duration: "3h 00m" },
+                    { title: "Stress & Cortisol", duration: "3h 00m" }
+                ]
+            },
+            {
+                title: "Module 2: Yoga Nidra Practice",
+                duration: "10 Hours",
+                subModules: [
+                    { title: "The 8 Stages of Yoga Nidra", duration: "4h 00m" },
+                    { title: "Sankalpa (Intention Setting)", duration: "2h 00m" },
+                    { title: "Guiding a Session: Scripts & Voice", duration: "4h 00m" }
+                ]
+            }
+        ]
     },
     {
         id: "p4",
@@ -45,11 +135,35 @@ export const PROGRAMS = [
         duration: "8 Weeks",
         level: "Intermediate",
         mode: "Live Workshops",
-        price: "₹28,000",
+
         description: "Specialize in teaching mindfulness and emotional intelligence to children. Includes curriculum design for schools.",
+        longDescription: "Empower the next generation with the tools of emotional intelligence and mindfulness. This unique certification is designed for teachers, parents, and counselors. You will learn age-appropriate meditation techniques, storytelling for wisdom, and how to create a mindful classroom culture. Rishi Ananda shares playful yet profound methods to help children navigate their emotions, build focus, and develop kindness.",
         image: "https://images.unsplash.com/photo-1489710437720-ebb67ec84dd2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
         mentor: "Rishi Ananda",
-        category: "Education"
+        category: "Education",
+        rating: 4.7,
+        reviewCount: 64,
+        enrolledCount: 450,
+        modules: [
+            {
+                title: "Module 1: Child Psychology & Development",
+                duration: "10 Hours",
+                subModules: [
+                    { title: "Emotional Stages of Development", duration: "4h 00m" },
+                    { title: " The Brain of a Child", duration: "3h 00m" },
+                    { title: "Building Trust & Safety", duration: "3h 00m" }
+                ]
+            },
+            {
+                title: "Module 2: Mindfulness for Kids",
+                duration: "12 Hours",
+                subModules: [
+                    { title: "Breath Friends: Teaching Breathwork", duration: "4h 00m" },
+                    { title: "Mindful Movement & Games", duration: "4h 00m" },
+                    { title: "Creative Visualization Stories", duration: "4h 00m" }
+                ]
+            }
+        ]
     }
 ];
 

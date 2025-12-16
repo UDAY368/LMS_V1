@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Search, MoreHorizontal, Shield, User } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useData } from "@/context/DataContext";
 
 export default function UsersPage() {
     return (
@@ -70,23 +73,35 @@ export default function UsersPage() {
 }
 
 function UserList({ role }: { role: string }) {
+    const { users } = useData();
+
+    // Filter users based on role
+    // Role mapping: 'Learner' -> 'learner', 'Mentor' -> 'mentor', 'Admin' -> 'admin'
+    const roleKey = role.toLowerCase();
+    const filteredUsers = users.filter((u: any) => u.role === roleKey);
+
+    if (filteredUsers.length === 0) {
+        return <div className="text-center py-8 text-muted-foreground">No {role}s found.</div>;
+    }
+
     return (
         <div className="space-y-4">
-            {[1, 2, 3, 4, 5].map((_, i) => (
-                <div key={i} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+            {filteredUsers.map((user: any) => (
+                <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
                     <div className="flex items-center gap-4">
                         <Avatar>
-                            <AvatarFallback>U{i}</AvatarFallback>
+                            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                            {user.avatar && <AvatarImage src={user.avatar} />}
                         </Avatar>
                         <div>
-                            <div className="font-medium">User Name {i + 1}</div>
-                            <div className="text-sm text-muted-foreground">user{i + 1}@example.com</div>
+                            <div className="font-medium">{user.name}</div>
+                            <div className="text-sm text-muted-foreground">{user.email}</div>
                         </div>
                     </div>
                     <div className="flex items-center gap-6">
-                        <div className="text-sm text-muted-foreground hidden md:block">Joined Dec 2024</div>
-                        <Badge variant={i === 2 ? "destructive" : "outline"}>
-                            {i === 2 ? "Suspended" : "Active"}
+                        <div className="text-sm text-muted-foreground hidden md:block">Joined {new Date(user.joinedDate).toLocaleDateString()}</div>
+                        <Badge variant="outline" className="bg-green-50 text-green-700 hover:bg-green-50 border-green-200">
+                            Active
                         </Badge>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

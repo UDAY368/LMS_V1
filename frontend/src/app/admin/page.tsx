@@ -33,7 +33,7 @@ export default function AdminDashboard() {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <AdminStats title="Total Revenue" value={formatCurrency(stats.totalRevenue)} icon={DollarSign} trend="12% vs last month" trendUp={true} />
+                <AdminStats title="Total Donations" value={formatCurrency(stats.totalRevenue)} icon={DollarSign} trend="12% vs last month" trendUp={true} />
                 <AdminStats title="Active Learners" value={stats.totalUsers.toString()} icon={Users} trend="5% vs last month" trendUp={true} />
                 <AdminStats title="Active Mentors" value={stats.totalMentors.toString()} icon={Users} trend="2 new this week" trendUp={true} />
                 <AdminStats title="Courses Pending" value={stats.pendingCourses.toString()} icon={BookOpen} trend="Requires attention" trendUp={false} />
@@ -85,7 +85,7 @@ export default function AdminDashboard() {
                                     </div>
                                     <div className="flex gap-2">
                                         <Button size="sm" variant="outline" asChild>
-                                            <Link href="/admin/courses">View</Link>
+                                            <Link href="/admin/courses">Review</Link>
                                         </Button>
                                     </div>
                                 </div>

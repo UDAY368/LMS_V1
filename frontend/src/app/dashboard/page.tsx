@@ -5,11 +5,12 @@ import { CourseProgressCard } from "@/components/dashboard/CourseProgressCard";
 import { BookOpen, Trophy, Flame, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { DonationModal } from "@/components/payment/DonationModal";
 import { useData } from "@/context/DataContext";
 import { useEffect, useState } from "react";
 
 export default function DashboardPage() {
-    const { currentUser, enrollments, courses, getLearnerStats } = useData();
+    const { currentUser, enrollments, courses, getLearnerStats, logout } = useData();
     const [stats, setStats] = useState({ inProgress: 0, completed: 0, streak: 0, hours: 0 });
 
     useEffect(() => {
@@ -23,6 +24,17 @@ export default function DashboardPage() {
     // Find active course (most recently accessed)
     const myEnrollments = enrollments.filter(e => e.studentId === currentUser.id);
     const lastActiveEnrollment = myEnrollments.sort((a, b) => new Date(b.lastAccessed).getTime() - new Date(a.lastAccessed).getTime())[0];
+
+    // Get all enrolled courses with progress
+    const enrolledCoursesList = myEnrollments.map(e => {
+        const course = courses.find(c => c.id === e.courseId);
+        if (!course) return null;
+        return {
+            ...course,
+            enrollment: e
+        };
+    }).filter(item => item !== null);
+
 
     const activeCourseData = lastActiveEnrollment ? courses.find(c => c.id === lastActiveEnrollment.courseId) : null;
 
@@ -50,6 +62,7 @@ export default function DashboardPage() {
                     <p className="text-muted-foreground">You are making great progress on your spiritual journey.</p>
                 </div>
                 <div className="flex gap-3">
+                    <DonationModal />
                     <Button variant="outline" asChild><Link href="/dashboard/learning">My Courses</Link></Button>
                     <Button asChild><Link href="/programs">Browse New</Link></Button>
                 </div>
@@ -80,6 +93,35 @@ export default function DashboardPage() {
                             </div>
                         )}
                     </section>
+
+                    {/* Recently Enrolled List (if more than 1) */}
+                    {enrolledCoursesList.length > 1 && (
+                        <section>
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-xl font-semibold">Your Courses</h2>
+                                <Link href="/dashboard/learning" className="text-sm text-primary hover:underline">View All</Link>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                {enrolledCoursesList.slice(0, 3).map(item => (
+                                    <div key={item!.id} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                                        <img src={item!.image} alt={item!.title} className="w-16 h-16 rounded object-cover" />
+                                        <div className="flex-1">
+                                            <h3 className="font-semibold text-sm md:text-base">{item!.title}</h3>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <div className="h-1.5 flex-1 bg-muted rounded-full overflow-hidden">
+                                                    <div className="h-full bg-primary" style={{ width: `${item!.enrollment.progress}%` }}></div>
+                                                </div>
+                                                <span className="text-xs text-muted-foreground">{item!.enrollment.progress}%</span>
+                                            </div>
+                                        </div>
+                                        <Button size="sm" variant="ghost" asChild>
+                                            <Link href={`/dashboard/learning`}>Continue</Link>
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
 
                     <section>
                         <div className="flex items-center justify-between mb-4">

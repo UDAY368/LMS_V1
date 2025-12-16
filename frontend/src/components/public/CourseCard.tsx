@@ -11,7 +11,6 @@ interface ProgramProps {
     duration: string;
     level: string;
     mode: string;
-    price: string;
     description: string;
     image: string;
     mentor: string;
@@ -66,8 +65,8 @@ export function CourseCard({ program }: CourseCardProps) {
             </CardContent>
             <CardFooter className="p-5 pt-0 flex items-center justify-between border-t bg-muted/20 mt-auto">
                 <div className="flex flex-col">
-                    <span className="text-xs text-muted-foreground">Course Fee</span>
-                    <span className="font-bold text-lg text-primary">{program.price}</span>
+                    <span className="text-xs text-muted-foreground uppercase tracking-wider">Enrollment</span>
+                    <span className="font-bold text-lg text-primary">Free</span>
                 </div>
                 <Button size="sm" className="gap-2" asChild>
                     <Link href={`/programs/${program.id}`}>

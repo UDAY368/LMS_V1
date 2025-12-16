@@ -51,7 +51,7 @@ export default function AdminCoursesPage() {
                         <TableRow>
                             <TableHead>Course Title</TableHead>
                             <TableHead>Mentor</TableHead>
-                            <TableHead>Price</TableHead>
+                            <TableHead>Cost</TableHead>
                             <TableHead>Category</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
@@ -62,7 +62,7 @@ export default function AdminCoursesPage() {
                             <TableRow key={course.id}>
                                 <TableCell className="font-medium">{course.title}</TableCell>
                                 <TableCell>{course.mentorName}</TableCell>
-                                <TableCell>₹{course.price}</TableCell>
+                                <TableCell>Free</TableCell>
                                 <TableCell>{course.category}</TableCell>
                                 <TableCell>
                                     <Badge variant={

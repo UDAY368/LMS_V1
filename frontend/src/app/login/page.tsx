@@ -13,7 +13,7 @@ import { Lock, Mail, ShieldCheck, GraduationCap, School } from "lucide-react";
 
 export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
-    const { setCurrentUser, users } = useData();
+    const { login, users } = useData();
     const router = useRouter();
 
     const handleLogin = (role: 'learner' | 'mentor' | 'admin') => {
@@ -23,12 +23,20 @@ export default function LoginPage() {
         setTimeout(() => {
             const user = users.find(u => u.role === role);
             if (user) {
-                setCurrentUser(user);
+                login(user);
 
-                // Redirect based on role
-                if (role === 'learner') router.push('/dashboard');
-                else if (role === 'mentor') router.push('/mentor');
-                else if (role === 'admin') router.push('/admin');
+                // Check for redirect param
+                const searchParams = new URLSearchParams(window.location.search);
+                const redirectUrl = searchParams.get('redirect');
+
+                if (redirectUrl) {
+                    router.push(decodeURIComponent(redirectUrl));
+                } else {
+                    // Redirect based on role
+                    if (role === 'learner') router.push('/dashboard');
+                    else if (role === 'mentor') router.push('/mentor');
+                    else if (role === 'admin') router.push('/admin');
+                }
             }
             setIsLoading(false);
         }, 800);

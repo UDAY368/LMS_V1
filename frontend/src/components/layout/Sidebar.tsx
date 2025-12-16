@@ -28,9 +28,8 @@ const sidebarLinks = [
 export function Sidebar() {
     const pathname = usePathname();
     const router = useRouter();
-    // We don't necessarily need access to currentUser here, just the ability to logout? 
-    // DataContext exports setCurrentUser.
-    const { setCurrentUser, currentUser } = useData();
+    // DataContext exports logout.
+    const { logout, currentUser } = useData();
 
     const handleLogout = () => {
         // Since we can't easily pass null if strict typing blocks it without inspecting constraints,
@@ -47,13 +46,12 @@ export function Sidebar() {
 
         // Actually, forcing a reload/redirect is effectively a logout in a real app if we cleared tokens.
         // For this demo context, we *should* clear the state.
-        // @ts-ignore
-        setCurrentUser(null);
+        logout();
         router.push('/login');
     };
 
     return (
-        <div className="flex h-full flex-col border-r bg-sidebar text-sidebar-foreground w-64">
+        <div className="flex h-screen sticky top-0 flex-col border-r bg-sidebar text-sidebar-foreground w-64">
             <div className="flex h-16 items-center border-b px-6">
                 <Link href="/" className="flex items-center gap-2 font-playfair font-bold text-lg">
                     <span className="text-primary">Spiritual Science</span>
@@ -61,8 +59,8 @@ export function Sidebar() {
             </div>
             <div className="flex-1 overflow-auto py-4">
                 <nav className="grid gap-1 px-2">
-                    {/* Mentor Links - Visible to Mentors and Admins */}
-                    {(currentUser?.role === 'mentor' || currentUser?.role === 'admin') && (
+                    {/* Mentor Links - Visible to Mentors only */}
+                    {currentUser?.role === 'mentor' && (
                         <div className="mb-6">
                             <h4 className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Mentor
